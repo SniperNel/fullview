@@ -37,14 +37,14 @@ class RoutineController(ControllerBase):
         return routine
 
     @put("/{routine_id:str}", response={200: RoutineSerializer})
-    async def update_routine(self, routine_id: int, routine_data: RoutineSerializer):
-        routine = self.routine_db.update(routine_id, routine_data)
+    async def update_routine(self, routine_id: str, routine_data: RoutineSerializer):
+        routine = self.routine_db.update(routine_id, routine_data.dict())
         if not routine:
             raise NotFound("Item not Found.")
         return routine
 
     @delete("/{routine_id:str}", response={204: dict})
-    async def delete_routine(self, routine_id: int):
+    async def delete_routine(self, routine_id: str):
         routine = self.routine_db.remove(routine_id)
         if not routine:
             raise NotFound("Item not found.")

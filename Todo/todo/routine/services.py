@@ -33,9 +33,8 @@ class RoutineDB:
         return routines
 
     def update(self, routine_id, update_data):
-        routine_d = Routine(morning=update_data.morning, afternoon=update_data.afternoon, night=update_data.night)
         routine = self.db.query(Routine).filter(Routine.id == routine_id)
-        routine.update(routine_d)
+        routine.update(update_data)
         self.db.commit()
         return routine.first()
 
