@@ -13,15 +13,8 @@ class ASampleDTO(DataclassSerializer):
     name: str
     age: t.Optional[int] = None
 """
-from dataclasses import dataclass
 
-from ellar.common import Serializer, DataclassSerializer
-from pydantic.networks import EmailStr
-
-@dataclass
-class UserCredentials(DataclassSerializer):
-    email: EmailStr
-    password: str
+from ellar.common import Serializer
 
 class RoutineSerializer(Serializer):
     morning: str
