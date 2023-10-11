@@ -15,6 +15,8 @@ from ellar.core import ConfigDefaultTypesMixin
 from ellar.core.versioning import BaseAPIVersioning, DefaultAPIVersioning
 
 
+#BASE_DIR = Path(__file__).parent.
+
 class BaseConfig(ConfigDefaultTypesMixin):
     DEBUG: bool = False
 
@@ -68,3 +70,6 @@ class BaseConfig(ConfigDefaultTypesMixin):
 
 class DevelopmentConfig(BaseConfig):
     DEBUG: bool = True
+
+class TestConfig(BaseConfig):
+    DEBUG = bool = False
