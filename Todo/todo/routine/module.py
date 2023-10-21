@@ -22,12 +22,14 @@ from ellar.core import ModuleBase
 from ellar.di import Container
 
 from .controllers import RoutineController
+from ..user.controllers import UserController
 from .services import RoutineDB
+from ..user.services import UserService
 
 
 @Module(
-    controllers=[RoutineController],
-    providers=[RoutineDB],
+    controllers=[RoutineController, UserController],
+    providers=[RoutineDB, UserService],
     routers=[],
 )
 class RoutineModule(ModuleBase):
@@ -36,4 +38,8 @@ class RoutineModule(ModuleBase):
     """
     def register_providers(self, container: Container) -> None:
         """for more complicated provider registrations, use container.register_instance(...) """
+        pass
+
+class userModule(ModuleBase):
+    def register_providers(self, container: Container) -> None:
         pass

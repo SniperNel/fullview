@@ -11,11 +11,12 @@ class MyController(ControllerBase):
 import typing as t
 from ellar.common import Controller, ControllerBase, get, delete, put, post
 from ellar.common.exceptions import NotFound
-from .schemas import RoutineSerializer, RetrieveRoutineSerializer
+from .schemas import RoutineSerializer
 from .services import RoutineDB
 
 from ..db.database import engine
 from ..db.database import Base
+from ..db.models import User, Routine
 
 Base.metadata.create_all(bind=engine)
 
@@ -24,32 +25,29 @@ class RoutineController(ControllerBase):
     def __init__(self, db: RoutineDB) -> None:
         self.routine_db = db
 
-    @get("/{routine_id:str}", response={200: RoutineSerializer})
-    async def get_routine_by_id(self, routine_id: int):
-        routine = self.routine_db.get(routine_id)
-        if not routine:
-            raise NotFound('Item not found.')
-        return routine
-
     @post("/create", response={200: RoutineSerializer})
     async def create_routine(self, routine_data: RoutineSerializer):
         routine = self.routine_db.add_routine(routine_data)
         return routine
 
-    @put("/{routine_id:str}", response={200: RoutineSerializer})
-    async def update_routine(self, routine_id: str, routine_data: RoutineSerializer):
-        routine = self.routine_db.update(routine_id, routine_data.dict())
+    @put("/{user_id:str}", response={200: RoutineSerializer})
+    async def update_routine(self, user_id: str, routine_id: str, routine_data: RoutineSerializer):
+        routine = self.routine_db.update(user_id, routine_id, routine_data.dict())
         if not routine:
-            raise NotFound("Item not Found.")
+            raise NotFound("User not Found.")
         return routine
 
-    @delete("/{routine_id:str}", response={204: dict})
-    async def delete_routine(self, routine_id: str):
-        routine = self.routine_db.remove(routine_id)
+    @delete("/user_routine_id", response={204: dict})
+    async def delete_routine(self, user_id: str, routine_id: str):
+        routine = self.routine_db.remove(user_id, routine_id)
         if not routine:
-            raise NotFound("Item not found.")
+            raise NotFound("User's routine not found.")
         return 204, {}
 
-    @get("/", response={200: t.List[RoutineSerializer]})
-    async def list(self):
-        return self.routine_db.list()
+    @get("/all", response={200: t.List[RoutineSerializer]})
+    async def list(self, user_id: int):
+        return self.routine_db.list(user_id)
+
+    @get("/status", response={200: t.List[RoutineSerializer]})
+    async def list_status(self, user_id: int, status_completed: bool):
+        return self.routine_db.list_completed(user_id, status_completed)

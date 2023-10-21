@@ -16,10 +16,14 @@ class ASampleDTO(DataclassSerializer):
 
 from ellar.common import Serializer
 
+
+
 class RoutineSerializer(Serializer):
     morning: str
     afternoon: str
     night: str
+    status_completed: bool
+    user_id: int
 
 class RetrieveRoutineSerializer(RoutineSerializer):
     pk: str
