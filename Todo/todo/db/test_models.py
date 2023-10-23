@@ -1,4 +1,4 @@
-from .models import Routine
+from .models import Routine, User
 
 
 def test_routine_model():
@@ -8,3 +8,14 @@ def test_routine_model():
     assert routine.night == "code"
     assert routine.status_completed == "true"
     assert routine.user_id == 1
+
+def test_user_model():
+    user = User(email="nel@gmail.com",
+                first_name="nel",
+                last_name="uche",
+                is_active="true"
+                )
+    assert user.email == "nel@gmail.com"
+    assert user.first_name == "nel"
+    assert user.last_name == "uche"
+    assert user.is_active == "true"
