@@ -18,3 +18,11 @@ pytest = "^7.4.2"
 [build-system]
 requires = ["poetry-core"]
 build-backend = "poetry.core.masonry.api"
+
+[ellar]
+default = "todo"
+[ellar.projects.todo]
+project-name = "todo"
+application = "todo.server:application"
+config = "todo.config:DevelopmentConfig"
+root-module = "todo.root_module:ApplicationModule"
