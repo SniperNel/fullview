@@ -21,16 +21,16 @@ from ellar.common import Module
 from ellar.core import ModuleBase
 from ellar.di import Container
 
-from .controllers import RoutineController
-from .services import RoutineDB
+from .controllers import UserController
+from .services import UserService
 
 
 @Module(
-    controllers=[RoutineController],
-    providers=[RoutineDB],
+    controllers=[UserController],
+    providers=[UserService],
     routers=[],
 )
-class RoutineModule(ModuleBase):
+class UserModule(ModuleBase):
     """
     Routine Module
     """

@@ -9,10 +9,11 @@ class AProvider
 class BProvider
     pass
 """
+import typing as t
 
 from ellar.di import injectable, singleton_scope
 
-from ..db.models import Routine, User
+from ..db.models import Routine
 from ..db.database import SessionLocal
 
 
@@ -21,7 +22,7 @@ class RoutineDB:
     def __init__(self) -> None:
         self.db = SessionLocal()
 
-    def add_routine(self, routine_data):
+    def add_routine(self, routine_data) -> t.Dict:
         routine = Routine(morning=routine_data.morning,
                           afternoon=routine_data.afternoon,
                           night=routine_data.night,
@@ -33,23 +34,23 @@ class RoutineDB:
         self.db.refresh(routine)
         return routine
 
-    def list(self, user_id):
+    def list(self, user_id) -> t.Dict:
         routines = self.db.query(Routine).filter(Routine.user_id == user_id).all()
         return routines
 
-    def list_completed(self, user_id, status_completed):
+    def list_completed(self, user_id, status_completed) -> t.Dict:
         routines = self.db.query(Routine).filter(Routine.user_id == user_id, Routine.status_completed == status_completed).all()
         return routines
 
 
-    def update(self, user_id, routine_id, update_data):
+    def update(self, user_id, routine_id, update_data) -> t.Dict:
         routine = self.db.query(Routine).filter(Routine.user_id == user_id, Routine.id == routine_id)
         routine.update(update_data)
         self.db.commit()
         return routine.first()
 
 
-    def remove(self, user_id, routine_id):
+    def remove(self, user_id, routine_id) -> None:
         delete = self.db.query(Routine).filter(Routine.user_id == user_id, Routine.id == routine_id).delete()
         self.db.commit()
         return delete

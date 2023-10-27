@@ -1,3 +1,5 @@
+import typing as t
+
 from ellar.di import injectable, singleton_scope
 
 from ..db.models import User
@@ -9,7 +11,7 @@ class UserService:
     def __init__(self) -> None:
         self.db = SessionLocal()
 
-    def create_user(self, user_data):
+    def create_user(self, user_data) -> t.Dict:
         user = User(email=user_data.email,
                     first_name=user_data.first_name,
                     last_name=user_data.last_name,
@@ -19,10 +21,10 @@ class UserService:
         self.db.refresh(user)
         return user
 
-    def get_all_users(self):
+    def get_all_users(self) -> t.Dict:
         users = self.db.query(User).all()
         return users
 
-    def get_user_by_id(self, user_id):
+    def get_user_by_id(self, user_id) -> t.Dict:
         user = self.db.query(User).filter(User.id == user_id).first()
         return user
