@@ -6,16 +6,20 @@ Make changes and define your own configurations specific to your application
 export ELLAR_CONFIG_MODULE=todo.config:DevelopmentConfig
 """
 
+import os.path
 import typing as t
+from pathlib import Path
 
+from pydantic.networks import PostgresDsn
 from pydantic.json import ENCODERS_BY_TYPE as encoders_by_type
 from starlette.middleware import Middleware
+from starlette.config import environ
 from ellar.common import IExceptionHandler, JSONResponse
 from ellar.core import ConfigDefaultTypesMixin
 from ellar.core.versioning import BaseAPIVersioning, DefaultAPIVersioning
 
 
-#BASE_DIR = Path(__file__).parent.
+BASE_DIR = Path(__file__).parent.parent
 
 class BaseConfig(ConfigDefaultTypesMixin):
     DEBUG: bool = False
@@ -67,9 +71,21 @@ class BaseConfig(ConfigDefaultTypesMixin):
         t.Any, t.Callable[[t.Any], t.Any]
     ] = encoders_by_type
 
+    # DATABASE_URL = "postgresql://postgres:140498@localhost/testing_db"
+
+    # SQLALCHEMY_CONFIG = {
+    #     "db_url": DATABASE_URL,
+    #     "pool_pre_ping": True,
+    #     "echo": False,
+    #     "migration_directory": os.path.join(BASE_DIR, "db", "migrations"),
+    # }
 
 class DevelopmentConfig(BaseConfig):
     DEBUG: bool = True
 
-class TestConfig(BaseConfig):
+class TestingConfig(BaseConfig):
     DEBUG = bool = False
+
+    DATABASE_URL = "postgresql://postgres:140498@localhost/testing_db"
+
+    # SQLALCHEMY_CONFIG = dict(BaseConfig.SQLALCHEMY_CONFIG, db_url=DATABASE_URL)

@@ -4,10 +4,7 @@ from ellar.common.exceptions import NotFound
 from .schemas import UserSerializer
 from .services import UserService
 
-from ..db.database import engine
-from ..db.database import Base
 
-Base.metadata.create_all(bind=engine)
 
 
 @Controller("/user")
