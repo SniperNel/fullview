@@ -10,19 +10,17 @@ class BProvider
     pass
 """
 import typing as t
-
 from ellar.di import injectable, singleton_scope
-from ellar.core import Config
 
-from ..db.database import get_session_maker
+
+from ..db.database import SessionLocal
 from ..db.models import Routine
 
 
 @injectable(scope=singleton_scope)
 class RoutineDB:
-    def __init__(self, config: Config) -> None:
-        session_maker = get_session_maker(config)
-        self.db = session_maker()
+    def __init__(self) -> None:
+        self.db = SessionLocal()
 
 
     def add_routine(self, routine_data) -> t.Dict:

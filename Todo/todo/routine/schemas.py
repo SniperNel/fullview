@@ -14,11 +14,13 @@ class ASampleDTO(DataclassSerializer):
     age: t.Optional[int] = None
 """
 
+import typing
 from ellar.common import Serializer
 
 
 
 class RoutineSerializer(Serializer):
+    id: typing.Optional[int]
     morning: str
     afternoon: str
     night: str

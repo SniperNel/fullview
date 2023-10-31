@@ -1,6 +1,8 @@
 import asyncio
 import os
 
+import alembic.config
+from alembic.config import Config
 import pytest
 from ellar.common.constants import ELLAR_CONFIG_MODULE
 from ellar.core import App
@@ -11,10 +13,10 @@ from sqlalchemy import text
 from sqlalchemy.ext.asyncio import AsyncEngine
 
 from .db.models import Base, User
-from .db.database import get_engine, get_session_maker
+from .db.database import engine, SessionLocal
 from .root_module import ApplicationModule
 
-os.environ.setdefault(ELLAR_CONFIG_MODULE, "todo.config:TestingConfig")
+os.environ.setdefault(ELLAR_CONFIG_MODULE, "todo.config:TestConfig")
 
 
 @pytest.fixture(scope="session")
@@ -42,34 +44,51 @@ def event_loop():
 
 
 @pytest.fixture(scope="session")
-def _db_engine(app):
-    engine = get_engine(app.config)
-    Base.metadata.create_all(bind=engine)
-    print("anything")
-    yield
-    # print("drop all")
-    # Base.metadata.drop_all(bind=engine)
+async def _db_engine(app):
+    engine = app.injector.get(AsyncEngine)
+
+    async with engine.connect() as conn:
+        await conn.execute(text("DROP TABLE IF EXISTS alembic_version"))
+        await conn.commit()
+
+    try:
+        async with engine.begin() as conn:
+            await conn.run_sync(Base.metadata.drop_all)
+    finally:
+        try:
+            yield
+        except Exception:
+            pass
+
+        async with engine.connect() as conn:
+            await conn.execute(text("DROP TABLE alembic_version"))
+            await conn.commit()
+
+        async with engine.begin() as conn:
+            await conn.run_sync(Base.metadata.drop_all)
+
+        await engine.dispose()
 
 
 @pytest.fixture(scope="session")
 def db(app, _db_engine):
     """yields a SQLAlchemy connection which is rollback after the test"""
-    yield app.config
+    yield
 
-# @pytest.fixture()
-# def user_create(app):
-#     session = SessionLocal()
-#     user_details = {
-#         "email":"email",
-#         "first_name": "first_name",
-#         "last_name": "last_name",
-#         "is_active": True,
-#     }
-#     user = User(**user_details)
-#     session.add(user)
-#     session.commit()
-#     session.refresh(user)
-#
-#     yield user
-#     session.query(User).filter(User.id == user.id).delete()
-#     session.commit()
+@pytest.fixture()
+def user_create(app):
+    session = SessionLocal(app.config)()
+    user_details = {
+        "email":"Nel@gmail.com",
+        "first_name": "Nel name",
+        "last_name": "Uche name",
+        "is_active": True
+    }
+    user = User(**user_details)
+    session.add(user)
+    session.commit()
+    session.refresh(user)
+
+    yield user
+    session.query(User).filter(User.id == user.id).delete()
+    session.commit()

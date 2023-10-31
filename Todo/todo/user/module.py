@@ -32,7 +32,7 @@ from .services import UserService
 )
 class UserModule(ModuleBase):
     """
-    Routine Module
+    User Module
     """
     def register_providers(self, container: Container) -> None:
         """for more complicated provider registrations, use container.register_instance(...) """

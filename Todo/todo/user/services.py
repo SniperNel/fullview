@@ -1,22 +1,30 @@
+"""
+Create a provider and declare its scope
+
+@injectable
+class AProvider
+    pass
+
+@injectable(scope=transient_scope)
+class BProvider
+    pass
+"""
 import typing as t
 
 from ellar.di import injectable, singleton_scope
-from ellar.core import Config
 from ellar.common import HTTPException
 
 from ..db.models import User
-from ..db.database import get_session_maker
+from ..db.database import SessionLocal
 
 
 
 @injectable(scope=singleton_scope)
 class UserService:
-    def __init__(self, config: Config) -> None:
-        session_maker = get_session_maker(config)
-        self.db = session_maker()
+    def __init__(self) -> None:
+        self.db = SessionLocal()
 
     def create_user(self, user_data) -> t.Dict:
-        print("ifff")
         if self.db.query(User).filter(User.email == user_data.email).first():
             raise HTTPException(status_code=400, detail=f"User with username {user_data.email} already exist")
         user = User(email=user_data.email,

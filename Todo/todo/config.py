@@ -6,14 +6,17 @@ Make changes and define your own configurations specific to your application
 export ELLAR_CONFIG_MODULE=todo.config:DevelopmentConfig
 """
 
+#import os.path
 import os.path
 import typing as t
 from pathlib import Path
 
-from pydantic.networks import PostgresDsn
+#from pydantic.networks import PostgresDsn
 from pydantic.json import ENCODERS_BY_TYPE as encoders_by_type
-from starlette.middleware import Middleware
+from pydantic.networks import PostgresDsn
 from starlette.config import environ
+from starlette.middleware import Middleware
+#from starlette.config import environ
 from ellar.common import IExceptionHandler, JSONResponse
 from ellar.core import ConfigDefaultTypesMixin
 from ellar.core.versioning import BaseAPIVersioning, DefaultAPIVersioning
@@ -72,20 +75,40 @@ class BaseConfig(ConfigDefaultTypesMixin):
     ] = encoders_by_type
 
     # DATABASE_URL = "postgresql://postgres:140498@localhost/testing_db"
+    # DATABASE_URL = "sqlite:///./test_sql_app.db"
 
-    # SQLALCHEMY_CONFIG = {
-    #     "db_url": DATABASE_URL,
-    #     "pool_pre_ping": True,
-    #     "echo": False,
-    #     "migration_directory": os.path.join(BASE_DIR, "db", "migrations"),
-    # }
+    DATABASE_URL = PostgresDsn.build(
+        scheme="postgresql+asyncpg",
+        user=environ.get("DATABASE_USER", ""),
+        password=environ.get("DATABASE_PASSWORD", ""),
+        host=environ.get("DATABASE_HOSTNAME", ""),
+        port=environ.get("DATABASE_PORT", ""),
+        path=f"/{environ.get('DATABASE_DB', '')}",
+    )
+
+    SQLALCHEMY_CONFIG = {
+        "db_url": DATABASE_URL,
+        "pool_pre_ping": True,
+        "echo": False,
+        "migration_directory": os.path.join(BASE_DIR, "db", "migrations"),
+    }
 
 class DevelopmentConfig(BaseConfig):
     DEBUG: bool = True
 
-class TestingConfig(BaseConfig):
+class TestConfig(BaseConfig):
     DEBUG = bool = False
 
-    DATABASE_URL = "postgresql://postgres:140498@localhost/testing_db"
+    DATABASE_URL = PostgresDsn.build(
+        scheme="postgresql+asyncpg",
+        user=environ.get("DATABASE_USER", ""),
+        password=environ.get("DATABASE_PASSWORD", ""),
+        host=environ.get("DATABASE_HOSTNAME", ""),
+        port=environ.get("DATABASE_PORT", ""),
+        path="/testing_db",
+    )
 
-    # SQLALCHEMY_CONFIG = dict(BaseConfig.SQLALCHEMY_CONFIG, db_url=DATABASE_URL)
+    # DATABASE_URL = "sqlite:///./test_sql_app.db"
+    # DATABASE_URL = "postgresql://postgres:140498@localhost/testing_db"
+
+    SQLALCHEMY_CONFIG = dict(BaseConfig.SQLALCHEMY_CONFIG, db_url=DATABASE_URL)

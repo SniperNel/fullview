@@ -1,3 +1,13 @@
+"""
+Define endpoints routes in python class-based fashion
+example:
+
+@Controller("/dogs", tag="Dogs", description="Dogs Resources")
+class MyController(ControllerBase):
+    @get('/')
+    def index(self):
+        return {'detail': "Welcome Dog's Resources"}
+"""
 import typing as t
 from ellar.common import Controller, ControllerBase, get, post
 from ellar.common.exceptions import NotFound
