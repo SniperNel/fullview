@@ -10,8 +10,8 @@ from .db.models import Base
 
 @Module(modules=[HomeModule, RoutineModule, UserModule])
 class ApplicationModule(ModuleBase, IApplicationStartup):
-    async def on_startup(self, app: App) -> None:
-        Base.metadata.create_all(bind=engine(app.config))
+    # async def on_startup(self, app: App) -> None:
+    #     Base.metadata.create_all(bind=engine(app.config))
 
     @exception_handler(404)
     def exception_404_handler(cls, ctx: IExecutionContext, exc: Exception) -> Response:

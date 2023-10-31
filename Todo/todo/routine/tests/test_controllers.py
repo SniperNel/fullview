@@ -18,8 +18,9 @@ class TestRoutineController:
         }
 
 
-    def test_create(self,db, user_create):
-        self.detail.update({"user_id": user_create.id})
+    def test_create(self,db):
+        user_id = 1
+        self.detail.update(f"{user_id}")
         response = self.client.post("/routine/create", json=self.detail)
         assert response.status_code == 200
         data = response.json()
@@ -42,11 +43,12 @@ class TestRoutineController:
         data = response.json()
         assert data
 
-    def test_update(self, db, user_create):
+    def test_update(self, db):
         detail_update = {
             "morning": "workout 2",
             "afternoon": "read 2",
             "night": "code",
+            "user_id": 1
         }
         response = self.client.put("/routine/1?routine_id=1", json=detail_update)
         assert response.status_code == 200
