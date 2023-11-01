@@ -74,24 +74,7 @@ class BaseConfig(ConfigDefaultTypesMixin):
         t.Any, t.Callable[[t.Any], t.Any]
     ] = encoders_by_type
 
-    # DATABASE_URL = "postgresql://postgres:140498@localhost/testing_db"
-    # DATABASE_URL = "sqlite:///./test_sql_app.db"
-
-    DATABASE_URL = PostgresDsn.build(
-        scheme="postgresql+asyncpg",
-        user=environ.get("DATABASE_USER", ""),
-        password=environ.get("DATABASE_PASSWORD", ""),
-        host=environ.get("DATABASE_HOSTNAME", ""),
-        port=environ.get("DATABASE_PORT", ""),
-        path=f"/{environ.get('DATABASE_DB', '')}",
-    )
-
-    SQLALCHEMY_CONFIG = {
-        "db_url": DATABASE_URL,
-        "pool_pre_ping": True,
-        "echo": False,
-        "migration_directory": os.path.join(BASE_DIR, "db", "migrations"),
-    }
+    SQLALCHEMY_URL = "postgresql://postgres:140498@localhost/todo"
 
 class DevelopmentConfig(BaseConfig):
     DEBUG: bool = True
@@ -99,16 +82,7 @@ class DevelopmentConfig(BaseConfig):
 class TestConfig(BaseConfig):
     DEBUG = bool = False
 
-    DATABASE_URL = PostgresDsn.build(
-        scheme="postgresql+asyncpg",
-        user=environ.get("DATABASE_USER", ""),
-        password=environ.get("DATABASE_PASSWORD", ""),
-        host=environ.get("DATABASE_HOSTNAME", ""),
-        port=environ.get("DATABASE_PORT", ""),
-        path="/testing_db",
-    )
 
-    # DATABASE_URL = "sqlite:///./test_sql_app.db"
-    # DATABASE_URL = "postgresql://postgres:140498@localhost/testing_db"
+    SQLALCHEMY_URL = "postgresql://postgres:140498@localhost/testing_db"
 
-    SQLALCHEMY_CONFIG = dict(BaseConfig.SQLALCHEMY_CONFIG, db_url=DATABASE_URL)
+    # SQLALCHEMY_CONFIG = dict(BaseConfig.SQLALCHEMY_CONFIG, db_url=SQLALCHEMY_DATABASE_URL)

@@ -1,15 +1,21 @@
+import os
 from logging.config import fileConfig
 
+from ellar.common.constants import ELLAR_CONFIG_MODULE
 from sqlalchemy import engine_from_config
 from sqlalchemy import pool
 
 from alembic import context
 
 from todo.db.models import Base
+from ellar.core import Config
 
+ellar_config = Config(config_module=os.environ.get(ELLAR_CONFIG_MODULE, "config:DevelopmentConfig"))
 # this is the Alembic Config object, which provides
 # access to the values within the .ini file in use.
 config = context.config
+
+config.set_main_option(name: 'sqlalchemy.url', ellar_config.SQLALCHEMY_URL)
 
 # Interpret the config file for Python logging.
 # This line sets up loggers basically.
