@@ -13,14 +13,14 @@ import typing as t
 from ellar.di import injectable, singleton_scope
 
 
-from ..db.database import SessionLocal
+from ..db.database import get_session_maker
 from ..db.models import Routine
 
 
 @injectable(scope=singleton_scope)
 class RoutineDB:
     def __init__(self) -> None:
-        self.db = SessionLocal()
+        self.db = get_session_maker()
 
 
     def add_routine(self, routine_data) -> t.Dict:

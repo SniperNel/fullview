@@ -81,8 +81,6 @@ class DevelopmentConfig(BaseConfig):
 
 class TestConfig(BaseConfig):
     DEBUG = bool = False
-
-
     SQLALCHEMY_URL = "postgresql://postgres:140498@localhost/testing_db"
 
     # SQLALCHEMY_CONFIG = dict(BaseConfig.SQLALCHEMY_CONFIG, db_url=SQLALCHEMY_DATABASE_URL)

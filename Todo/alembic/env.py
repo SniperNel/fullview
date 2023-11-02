@@ -1,6 +1,7 @@
 import os
 from logging.config import fileConfig
 
+import sqlalchemy
 from ellar.common.constants import ELLAR_CONFIG_MODULE
 from sqlalchemy import engine_from_config
 from sqlalchemy import pool

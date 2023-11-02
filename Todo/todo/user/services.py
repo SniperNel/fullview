@@ -15,14 +15,14 @@ from ellar.di import injectable, singleton_scope
 from ellar.common import HTTPException
 
 from ..db.models import User
-from ..db.database import SessionLocal
+from ..db.database import get_session_maker
 
 
 
 @injectable(scope=singleton_scope)
 class UserService:
     def __init__(self) -> None:
-        self.db = SessionLocal()
+        self.db = get_session_maker()
 
     def create_user(self, user_data) -> t.Dict:
         if self.db.query(User).filter(User.email == user_data.email).first():

@@ -4,7 +4,7 @@ from ellar.samples.modules import HomeModule
 from .routine.module import RoutineModule
 from .user.module import UserModule
 
-from .db.database import engine
+from .db.database import get_engine
 from .db.models import Base
 
 
