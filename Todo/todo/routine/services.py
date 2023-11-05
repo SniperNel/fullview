@@ -44,14 +44,14 @@ class RoutineDB:
         return routines
 
 
-    def update(self, user_id, routine_id, update_data) -> t.Dict:
-        routine = self.db.query(Routine).filter(Routine.user_id == user_id, Routine.id == routine_id)
+    def update(self, routine_id, user_id, update_data) -> t.Dict:
+        routine = self.db.query(Routine).filter(Routine.id == routine_id, Routine.user_id == user_id)
         routine.update(update_data)
         self.db.commit()
-        return routine.first()
+        return routine
 
 
-    def remove(self, user_id, routine_id) -> None:
-        delete = self.db.query(Routine).filter(Routine.user_id == user_id, Routine.id == routine_id).delete()
+    def remove(self, routine_id, user_id) -> None:
+        delete = self.db.query(Routine).filter(Routine.id == routine_id, Routine.user_id == user_id).delete()
         self.db.commit()
         return delete

@@ -8,18 +8,15 @@ from sqlalchemy.orm import declarative_base
 from sqlalchemy.orm import sessionmaker
 
 
-
-# SQLALCHEMY_DATABASE_URL = "postgresql://postgres:140498@localhost/todo"
-
 @cache
 def get_engine():
-    config = Config(config_module=os.environ.get(ELLAR_CONFIG_MODULE))
-    engine = create_engine(config.SQLALCHEMY_URL, connect_args={"check_same_thread": False})
+    config = Config(config_module=os.environ.get(ELLAR_CONFIG_MODULE, "todo.config:DevelopmentConfig"))
+    engine = create_engine(config.SQLALCHEMY_URL)
     return engine
 
 
 def get_session_maker():
     SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=get_engine())
-    return SessionLocal
+    return SessionLocal()
 
 Base = declarative_base()

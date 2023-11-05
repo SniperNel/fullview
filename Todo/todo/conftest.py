@@ -1,20 +1,17 @@
+import pytest
 import asyncio
 import os
-from pathlib import Path
 
-import alembic.config
-from alembic.command import upgrade, downgrade
+from alembic.command import upgrade
 from alembic.config import Config
-import pytest
 from ellar.common.constants import ELLAR_CONFIG_MODULE
 from ellar.core import App
 from ellar.testing import Test
 from ellar.testing.module import TestingModule
 from httpx import AsyncClient
-from sqlalchemy import text, create_engine
-from sqlalchemy.ext.asyncio import AsyncEngine
+from sqlalchemy import create_engine
+from sqlalchemy.orm import sessionmaker
 
-from .db.database import get_session_maker
 from .db.models import Base, User
 from .root_module import ApplicationModule
 
@@ -45,72 +42,44 @@ def event_loop():
     loop.close()
 
 
-# @pytest.fixture(scope="session")
-# async def _db_engine(app):
-#     engine = app.injector.get(AsyncEngine)
-#
-#     async with engine.connect() as conn:
-#         await conn.execute(text("DROP TABLE IF EXISTS alembic_version"))
-#         await conn.commit()
-#
-#     try:
-#         async with engine.begin() as conn:
-#             await conn.run_sync(Base.metadata.drop_all)
-#     finally:
-#         try:
-#             yield
-#         except Exception:
-#             pass
-#
-#         async with engine.connect() as conn:
-#             await conn.execute(text("DROP TABLE alembic_version"))
-#             await conn.commit()
-#
-#         async with engine.begin() as conn:
-#             await conn.run_sync(Base.metadata.drop_all)
-#
-#         await engine.dispose()
-
 @pytest.fixture(scope="session")
 def migration_config() -> Config:
     config = Config()
 
-
-    config.set_main_option(name: 'script_location', os.path.join(str(Path(__file__).parent), 'migration'))
-
+    config.set_main_option('script_location', 'db/alembic')
 
     return config
 
+
 @pytest.fixture(scope="session")
-def db(app, migration_config):
-    engine = create_engine(app.config.SQLALCHEMY_URL, connect_args={"check_same_thread": False})
+def db_engine(app, migration_config):
+    engine = create_engine(app.config.SQLALCHEMY_URL)
+    Base.metadata.create_all(bind=engine)
+    upgrade(migration_config, revision='head')
 
-    try:
-        Base.metadata.drop_all(bind=engine)
-        upgrade(migration_config, revision='head')
+    yield engine
 
-        yield
-    except Exception:
-        pass
+    Base.metadata.drop_all(bind=engine)
+    engine.dispose()
 
-        Base.metadata.drop_all(bind=engine)
-        downgrade(migration_config, revision='')
-        engine.dispose()
 
-@pytest.fixture()
-def user_create(app):
-    session = get_session_maker(app.config)()
-    user_details = {
-        "email":"Nel@gmail.com",
-        "first_name": "Nel name",
-        "last_name": "Uche name",
-        "is_active": True
-    }
-    user = User(**user_details)
-    session.add(user)
-    session.commit()
-    session.refresh(user)
+@pytest.fixture(scope="session")
+def db(app, db_engine):
+    session = sessionmaker(autocommit=False, autoflush=False, bind=db_engine)
+    session.begin()
+    yield session()
+    session.close_all()
+
+@pytest.fixture(scope="session")
+def create_user(db):
+    user = User(id=1,
+                email="nel1@gmail.com",
+                first_name="nel",
+                last_name="uche",
+                is_active=True
+                )
+    db.add(user)
+    db.commit()
+    db.refresh(user)
 
     yield user
-    session.query(User).filter(User.id == user.id).delete()
-    session.commit()

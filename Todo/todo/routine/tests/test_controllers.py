@@ -10,24 +10,24 @@ class TestRoutineController:
         self.test_module = Test.create_test_module(controllers=[RoutineController],
                                                    providers=[ProviderConfig(RoutineDB, use_class=RoutineDB)])
         self.client: TestClient = self.test_module.get_test_client()
-        self.detail = {
+
+
+    def test_create(self, db):
+        detail = {
             "morning": "trying from test",
             "afternoon": "cook",
             "night": "sleep",
-            "status_completed": False
+            "status_completed": False,
+            "user_id": 1
         }
-
-
-    def test_create(self,db):
-        user_id = 1
-        self.detail.update(f"{user_id}")
-        response = self.client.post("/routine/create", json=self.detail)
+        response = self.client.post("/routine/create", json=detail)
         assert response.status_code == 200
         data = response.json()
         assert data
-        assert data["morning"] == self.detail["morning"]
-        assert data["afternoon"] == self.detail["afternoon"]
-        assert data["night"] == self.detail["night"]
+        assert data["morning"] == detail["morning"]
+        assert data["afternoon"] == detail["afternoon"]
+        assert data["night"] == detail["night"]
+
 
     def test_get_list(self, db):
         user_id = 1
@@ -48,16 +48,15 @@ class TestRoutineController:
             "morning": "workout 2",
             "afternoon": "read 2",
             "night": "code",
-            "user_id": 1
         }
-        response = self.client.put("/routine/1?routine_id=1", json=detail_update)
+        response = self.client.patch("/routine/1?user_id=1", json=detail_update)
         assert response.status_code == 200
 
         data = response.json()
-        print(data)
+        print("for update", data)
         assert data
 
 
     def test_delete(self, db):
-        response = self.client.delete("/routine/1?routine_id=1")
+        response = self.client.delete("/routine/1?user_id=1")
         assert response.status_code == 204

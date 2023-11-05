@@ -16,7 +16,6 @@ class User(Base):
     is_active = Column(Boolean, default=True)
     created_date = Column(DateTime, default=datetime.utcnow, nullable=False)
 
-    # one-to-many relationship with the Routine model
     routines = relationship('Routine', back_populates='users')
 
 
@@ -29,8 +28,6 @@ class Routine(Base):
     night = Column(String, index=True)
     status_completed = Column("completed", Boolean, default=False)
 
-    #a foreign key relationship to the User model
     user_id = Column(Integer, ForeignKey('users.id'), nullable=False)
 
-    # a reference to the User model
     users = relationship('User', back_populates='routines')

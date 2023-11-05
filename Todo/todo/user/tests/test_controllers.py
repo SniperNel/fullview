@@ -13,7 +13,7 @@ class TestUserController:
 
     def test_user_create(self, db):
         data = {
-            "email": "eze2@gmail.com",
+            "email": "ezeh1@gmail.com",
             "first_name": "nel",
             "last_name": "uche",
             "is_active": True,
@@ -27,12 +27,14 @@ class TestUserController:
         assert detail["first_name"] == data["first_name"]
         assert detail["last_name"] == data["last_name"]
 
+
     def test_user_get(self, db):
         response = self.client.get("/user/")
         assert response.status_code == 200
         data = response.json()
         print(data)
         assert data
+
 
     def test_get_user_id(self, db):
         user_id = 1

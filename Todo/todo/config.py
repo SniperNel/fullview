@@ -6,15 +6,11 @@ Make changes and define your own configurations specific to your application
 export ELLAR_CONFIG_MODULE=todo.config:DevelopmentConfig
 """
 
-#import os.path
-import os.path
 import typing as t
 from pathlib import Path
 
 #from pydantic.networks import PostgresDsn
 from pydantic.json import ENCODERS_BY_TYPE as encoders_by_type
-from pydantic.networks import PostgresDsn
-from starlette.config import environ
 from starlette.middleware import Middleware
 #from starlette.config import environ
 from ellar.common import IExceptionHandler, JSONResponse
@@ -76,6 +72,7 @@ class BaseConfig(ConfigDefaultTypesMixin):
 
     SQLALCHEMY_URL = "postgresql://postgres:140498@localhost/todo"
 
+
 class DevelopmentConfig(BaseConfig):
     DEBUG: bool = True
 
@@ -83,4 +80,3 @@ class TestConfig(BaseConfig):
     DEBUG = bool = False
     SQLALCHEMY_URL = "postgresql://postgres:140498@localhost/testing_db"
 
-    # SQLALCHEMY_CONFIG = dict(BaseConfig.SQLALCHEMY_CONFIG, db_url=SQLALCHEMY_DATABASE_URL)
