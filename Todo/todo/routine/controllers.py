@@ -9,7 +9,8 @@ class MyController(ControllerBase):
         return {'detail': "Welcome Dog's Resources"}
 """
 import typing as t
-from ellar.common import Controller, ControllerBase, get, delete, post, patch
+from typing import Optional
+from ellar.common import Controller, ControllerBase, get, delete, post, put
 from ellar.common.exceptions import NotFound
 from .schemas import RoutineSerializer, RetrieveRoutineSerializer
 from .services import RoutineDB
@@ -25,19 +26,20 @@ class RoutineController(ControllerBase):
         routine = self.db.add_routine(routine_data)
         return routine
 
-    @patch("/{routine_id:int}", response={200: RetrieveRoutineSerializer})
-    async def update_routine(self, user_id: int, routine_id: int, routine_data: RoutineSerializer) -> t.Dict:
-        routine = self.db.update(routine_id, user_id, routine_data.dict())
+    @put("/{user_id}/{routine_id}", response={200: RoutineSerializer})
+    async def update_routine(self, routine_id: int, user_id: int, routine_data: RoutineSerializer) -> Optional[RoutineSerializer]:
+        update_data = routine_data.dict(exclude_unset=True)
+        routine = self.db.update(routine_id, user_id, update_data)
         if not routine:
             raise NotFound("User not Found.")
-        return routine
+        return RoutineSerializer.from_orm(routine)
 
-    @delete("/{routine_id:str}", response={204: dict})
+    @delete("/{user_id}/{routine_id}", response={200: dict})
     async def delete_routine(self, user_id: int, routine_id: int) -> t.Optional[int]:
         routine = self.db.remove(user_id, routine_id)
         if not routine:
             raise NotFound("User's routine not found.")
-        return 204
+        return 200, {}
 
     @get("/all/{user_id:str}", response={200: t.List[RoutineSerializer]})
     async def list(self, user_id: int) -> t.Dict:

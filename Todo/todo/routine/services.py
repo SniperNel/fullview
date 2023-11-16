@@ -10,6 +10,7 @@ class BProvider
     pass
 """
 import typing as t
+from typing import Union
 from ellar.di import injectable, singleton_scope
 
 
@@ -44,14 +45,14 @@ class RoutineDB:
         return routines
 
 
-    def update(self, routine_id, user_id, update_data) -> t.Dict:
-        routine = self.db.query(Routine).filter(Routine.id == routine_id, Routine.user_id == user_id)
+    def update(self, user_id: int, routine_id: int, update_data: dict) -> Union[Routine, None]:
+        routine = self.db.query(Routine).filter(Routine.user_id == user_id, Routine.id == routine_id)
         routine.update(update_data)
         self.db.commit()
-        return routine
+        return routine.first()
 
 
-    def remove(self, routine_id, user_id) -> None:
-        delete = self.db.query(Routine).filter(Routine.id == routine_id, Routine.user_id == user_id).delete()
+    def remove(self, user_id: int, routine_id: int) -> int:
+        delete = self.db.query(Routine).filter(Routine.user_id == user_id, Routine.id == routine_id).delete()
         self.db.commit()
         return delete

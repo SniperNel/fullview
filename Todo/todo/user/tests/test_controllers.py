@@ -28,7 +28,7 @@ class TestUserController:
         assert detail["last_name"] == data["last_name"]
 
 
-    def test_user_get(self, db):
+    def test_user_get(self, db, create_user):
         response = self.client.get("/user/")
         assert response.status_code == 200
         data = response.json()
@@ -36,7 +36,7 @@ class TestUserController:
         assert data
 
 
-    def test_get_user_id(self, db):
+    def test_get_user_id(self, db, create_user):
         user_id = 1
         response = self.client.get(f"/user/{user_id}")
         assert response.status_code == 200
